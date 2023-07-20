@@ -15,17 +15,18 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   List items = [];
   void showErrorMessage(String message) {
-      final snackBar = SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.red,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> fetchToDo() async {
-    final url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
+    const url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
     final uri = Uri.parse(url);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -48,35 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> navigateToAddPage() async {
-      final route = MaterialPageRoute(
-        builder: (context) => AddToDoPage(),
-      );
-      await Navigator.push(context, route);
-      setState(() {
-        isLoading = true;
-      });
-      fetchToDo();
-    }
-     Future<void> deleteById(String id) async {
-      final url = 'https://api.nstack.in/v1/todos/$id';
-      final uri = Uri.parse(url);
-      final response = await http.delete(uri);
-      if (response.statusCode == 200) {
-        final filtered =
-            items.where((element) => element['_id'] != id).toList();
-      } else {
-        showErrorMessage('Can not Delete');
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('ToDo List'),
+        title: const Text('ToDo List'),
       ),
       body: Visibility(
         visible: isLoading,
-        replacement: Center(
+        replacement: const Center(
           child: CircularProgressIndicator(),
         ),
         child: RefreshIndicator(
@@ -100,13 +79,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   itemBuilder: (context) {
                     return [
-                      PopupMenuItem(
-                        child: Text('Edit'),
+                      const PopupMenuItem(
                         value: 'edit',
+                        child: Text('Edit'),
                       ),
-                      PopupMenuItem(
-                        child: Text('Delete'),
+                      const PopupMenuItem(
                         value: 'delete',
+                        child: Text('Delete'),
                       ),
                     ];
                   },
@@ -118,19 +97,44 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToAddPage,
-        label: Text('Add ToDo'),
+        label: const Text('Add ToDo'),
       ),
     );
   }
 
-Future<void> navigateToEditPage(Map item) async {
+  Future<void> navigateToAddPage() async {
+    final route = MaterialPageRoute(
+      builder: (context) => const AddToDoPage(),
+    );
+    await Navigator.push(context, route);
+    setState(() {
+      isLoading = true;
+    });
+    fetchToDo();
+  }
+
+  Future<void> deleteById(String id) async {
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.delete(uri);
+    if (response.statusCode == 200) {
+      final filtered = items.where((element) => element['_id'] != id).toList();
+      setState(() {
+        items = filtered;
+      });
+    } else {
+      showErrorMessage('Can not Delete');
+    }
+  }
+
+  Future<void> navigateToEditPage(Map item) async {
     final route = MaterialPageRoute(
       builder: (context) => AddToDoPage(ToDo: item),
     );
     await Navigator.push(context, route);
     setState(() {
-      isLoading=true;
-    });   
+      isLoading = true;
+    });
     fetchToDo();
   }
 }

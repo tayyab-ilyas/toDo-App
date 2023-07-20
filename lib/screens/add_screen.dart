@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 class AddToDoPage extends StatefulWidget {
   final Map? ToDo;
   const AddToDoPage({super.key, this.ToDo});
@@ -34,65 +33,62 @@ class _AddToDoPageState extends State<AddToDoPage> {
       appBar: AppBar(
         title: Text(isEdit ? 'Edit Todo' : 'Add Todo'),
       ),
-      body: ListView(padding: EdgeInsets.all(20), children: [
+      body: ListView(padding: const EdgeInsets.all(20), children: [
         TextField(
           controller: titleController,
-          decoration: InputDecoration(hintText: 'Title'),
+          decoration: const InputDecoration(hintText: 'Title'),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         TextField(
           controller: descriptionController,
-          decoration: InputDecoration(hintText: 'Description'),
+          decoration: const InputDecoration(hintText: 'Description'),
           keyboardType: TextInputType.multiline,
           minLines: 5,
           maxLines: 8,
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: ElevatedButton(
-            onPressed: isEdit?updateData:submitData,
+            onPressed: isEdit ? updateData : submitData,
             child: Text(
               isEdit ? 'Update' : 'Submit',
             ),
           ),
         )
       ]),
-       
     );
-   
   }
-Future<void>updateData()async{
-  final ToDo = widget.ToDo;
-  if(ToDo == null){
-    print('Please enetr data');
-    return;
-  }
-  final id = ToDo['_id'];
 
-  final title = titleController.text;
-  final description = descriptionController.text;
-  final body={
-    "title":title,
-    "description":description,
-    "is_completed":false
-  };
-       final url='https://api.nstack.in/v1/todos/$id';
-       final uri = Uri.parse(url);
-       final response = await http.put(
-        uri,
-        body:jsonEncode(body),
-        headers:{'Content-Type':'application/json'},
-       );
-       if (response.statusCode == 200) {
+  Future<void> updateData() async {
+    final ToDo = widget.ToDo;
+    if (ToDo == null) {
+      return;
+    }
+    final id = ToDo['_id'];
+
+    final title = titleController.text;
+    final description = descriptionController.text;
+    final body = {
+      "title": title,
+      "description": description,
+      "is_completed": false,
+    };
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.put(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (response.statusCode == 200) {
       //200-->success
       showSuccessMessage('Updated');
     } else {
       showErrorMessage('Failed');
     }
+  }
 
-
-}
   Future<void> submitData() async {
     //this chunk sends data to the server (get)
     final title = titleController.text;
@@ -103,7 +99,7 @@ Future<void>updateData()async{
       "is_completed": false,
     };
     //submit data to server (post)(end point)
-    final url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
+    const url = 'https://api.nstack.in/v1/todos';
     final uri = Uri.parse(url);
     final response = await http.post(uri,
         body: jsonEncode(body), headers: {'Content-Type': 'application/json'});
@@ -120,7 +116,9 @@ Future<void>updateData()async{
   }
 
   void showSuccessMessage(String message) {
-    final snackBar = SnackBar(content: Text(message));
+    final snackBar = SnackBar(
+      content: Text(message),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -128,7 +126,7 @@ Future<void>updateData()async{
     final snackBar = SnackBar(
       content: Text(
         message,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.red,
     );
